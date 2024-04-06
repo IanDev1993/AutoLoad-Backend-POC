@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "\\\\wsl.localhost\\Ubuntu-22.04\\home\\ian\\Project\\BackEndMimimal\\app.db",
+            "name": "AppDbContext"
+        }
+    ]
+}
