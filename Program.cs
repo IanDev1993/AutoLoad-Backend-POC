@@ -1,10 +1,8 @@
-using System.Reflection.Metadata.Ecma335;
 using BackEndMimimal.Models;
-using BackEndMimimal.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Microsoft.VisualBasic;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
