@@ -489,4 +489,4 @@ $RECYCLE.BIN/
 
 *.gitignore
 
-*.db
+.db
