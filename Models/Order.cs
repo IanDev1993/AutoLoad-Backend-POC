@@ -1,7 +1,14 @@
-public class Order{
-    public Guid Id { get; set; }
-    public OrderDriver? Driver { get; set; }
-    public string Code { get; set; } = null!;
-    public DateTime CreatedAt { get; set; } 
-    public bool Status { get; set; } 
+namespace BackEndMimimal.Models;
+
+public class Order
+{
+    public Order()
+    {
+        Id = Guid.NewGuid();      
+        CreatedAt = DateTime.Now;
+    }
+    public Guid Id { get; set; } 
+    public string? Code { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public bool Status { get; set; }
 }
