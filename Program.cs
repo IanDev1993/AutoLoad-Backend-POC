@@ -68,11 +68,8 @@ app.MapPost("/order", async (
         };
 
         context.Orders.Add(order);
-
         await context.SaveChangesAsync();
-
-        return Results.Created($"/orders/{order.Id}", order);
-    }
+      }
 ).Produces(StatusCodes.Status201Created)
     .Produces(StatusCodes.Status400BadRequest)
     .WithName("CreateOrder")
