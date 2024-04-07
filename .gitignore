@@ -488,3 +488,5 @@ $RECYCLE.BIN/
 *.sln
 
 *.gitignore
+
+*.db
