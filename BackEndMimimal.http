@@ -1,6 +1,0 @@
-@BackEndMimimal_HostAddress = http://localhost:5008
-
-GET {{BackEndMimimal_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
