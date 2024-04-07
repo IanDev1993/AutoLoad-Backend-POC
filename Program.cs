@@ -4,6 +4,7 @@ using BackEndMimimal.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Microsoft.VisualBasic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,37 +47,59 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
 app.MapGet("/order", async (AppDbContext context) => 
-    await context
-    .Orders
-    .AsNoTracking()
-    .ToListAsync()
-).Produces(StatusCodes.Status201Created)
-    .Produces(StatusCodes.Status400BadRequest)
-    .WithName(endpointName: "GetOrders")
-    .WithTags("Order");;
+    {
+        var orders = await context.Orders.AsNoTracking().ToListAsync();
+        
+        return orders.Count>0 ? Results.Ok(orders) : Results.NoContent();
+    }   
+ ).Produces(StatusCodes.Status200OK).Produces(StatusCodes.Status204NoContent).WithName(endpointName: "GetOrders").WithTags("Order");
 
 app.MapPost("/order", async (
-    [FromBody] OrderDTO orderDto,
+    [FromQuery] string code,
+    [FromQuery] bool status,
     [FromServices] AppDbContext context) =>
     {
         Order order = new Order()
         {
-            Code=orderDto.Code,
-            Status=orderDto.Status,
+            Code = code,
+            Status = status,
         };
 
-        context.Orders.Add(order);
-        await context.SaveChangesAsync();
+       context.Orders.Add(order);
+       var result = await context.SaveChangesAsync();
+
+       return result > 0 ? Results.CreatedAtRoute("GetOrders",order) : Results.BadRequest();
       }
-).Produces(StatusCodes.Status201Created)
-    .Produces(StatusCodes.Status400BadRequest)
-    .WithName("CreateOrder")
-    .WithTags("Order");
+).Produces(StatusCodes.Status201Created).Produces(StatusCodes.Status400BadRequest).WithName("CreateOrder").WithTags("Order");
+
+app.MapPut("/order", async (
+    [FromQuery] Guid id,
+    [FromQuery] bool status,
+    [FromServices] AppDbContext context) =>
+    {
+        Order? order = await context.Orders.FindAsync(id) ?? null;
+
+        if(order is null)
+        {
+            return Results.NotFound();
+        }            
+        else
+        {        
+            order.Status = status;
+        
+            context.Orders.Update(order);
+
+            var result = await context.SaveChangesAsync();
+            
+            return result > 0 ? Results.Ok(order) : Results.BadRequest();
+        }  
+}
+).Produces(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status400BadRequest).WithName("UpdateOrder").WithTags("Order");
+
 
 app.MapDelete("/order", async (
-    [FromBody] Guid id,
+    [FromQuery] Guid id,
     [FromServices] AppDbContext context) =>
     {       
         Order? order = await context.Orders.FindAsync(id) ?? null;
@@ -89,22 +112,12 @@ app.MapDelete("/order", async (
         {
             context.Orders.Remove(order);
 
-            await context.SaveChangesAsync();
+            var result = await context.SaveChangesAsync();
             
-            return Results.Ok(order);
-        }
-      
+            return result > 0 ? Results.Ok(order) : Results.BadRequest();
+        }      
     }
-).Produces(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status204NoContent)
-    .WithName("DeleteOrder")
-    .WithTags("Order");
-
-
-
-
-
-
+).Produces(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound).Produces(StatusCodes.Status400BadRequest).WithName("DeleteOrder").WithTags("Order");
 
 app.UseHttpsRedirection();
 app.UseCors("corspolicy");
